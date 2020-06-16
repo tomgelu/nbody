@@ -16,7 +16,7 @@ use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
 use rand::Rng;
-use std::f32::consts::PI;
+use std::f64::consts::PI;
 
 const GRAVITY: f64 = 6.67428e-11;
 const DAY: f64 = 24.0 * 3600.0;
@@ -55,7 +55,7 @@ impl App {
                 .fold(glm::vec3::<f64>(0.0, 0.0, 0.0), |acc, curr| {
                     acc + curr.clone()
                 });
-            sums.push(sum);
+            sums.insert(0, sum);
             // add reduced forces to sum vec
         }
         for body in all.iter_mut() {
@@ -79,7 +79,7 @@ fn main() {
         .exit_on_esc(true)
         .build()
         .unwrap();
-
+    /*
     let sun = Body {
         name: String::from("Sun"),
         mass: 333000.0,
@@ -101,9 +101,11 @@ fn main() {
     let mut all: Vec<Body> = Vec::new();
     all.push(sun);
     all.push(earth);
-    /*
+    */
     let solar_mass: f64 = 1.989 * 10.0_f64.powi(30);
     let sun = Body {
+        name: String::from("Sun"),
+        color: [0.0, 1.0, 1.0, 1.0],
         mass: solar_mass,
         radius: 10.0,
         position: glm::vec3(0.0, 0.0, 0.0),
@@ -112,35 +114,51 @@ fn main() {
     };
 
     let earth = Body {
+        name: String::from("Earth"),
+        color: [0.0, 0.0, 1.0, 1.0],
         mass: 5.972 * 10.0_f64.powi(24),
         radius: 5.0,
-        position: glm::vec3(1.0 * AU, 1.0 * AU, 1.0 * AU),
+        /*
+        position: glm::vec3(
+            1.0 / (3.0).sqrt() * AU,
+            1.0 / (3.0).sqrt() * AU,
+            1.0 / (3.0).sqrt() * AU,
+        ),
+        */
+        position: glm::vec3(AU, 0.0, 0.0),
         velocity: glm::vec3(0.0, 29.78 * 1000.0, 0.0),
         acceleration: glm::vec3(0.0, 0.0, 0.0),
     };
 
     let mut all: Vec<Body> = Vec::new();
     all.push(sun);
-    // all.push(earth);
-    let area = 1;
+    all.push(earth);
+    let area = AU * 5.0;
     let mut rng = rand::thread_rng();
-    for _ in 0..0 {
+    for i in 0..100 {
         let spherical_position = glm::vec3::<f64>(
-            (rng.gen_range(0., 1.).sqrt() - 0.5) * area as f64,
+            (rng.gen_range(0., 1.).sqrt() + 0.5) * area as f64,
             rng.gen_range(0.0, 2.0 * PI) as f64,
             rng.gen_range(0.0, PI * 2.0) as f64,
         );
-        let spherical_velocity = glm::vec3(1.0 as f64, 29.78 * 1000.0 as f64, 0.0 as f64);
+        /*
+        let spherical_velocity = glm::vec3(
+            29.78 * 1000.0 as f64,
+            rng.gen_range(0.0, 2.0 * PI) as f64,
+            0.0 as f64,
+        );
+        */
         let b = Body {
-            mass: 0.1 * solar_mass,
-            radius: 5.0,
+            name: i.to_string(),
+            color: [1.0, 0.0, 0.0, 1.0],
+            mass: 0.2 * solar_mass,
+            radius: 2.0,
             position: conv::spherical_to_cartesian(&spherical_position),
-            velocity: conv::spherical_to_cartesian(&spherical_velocity),
+            velocity: glm::vec3(0.0, 29.78 * 1000.0, 0.0),
             acceleration: glm::vec3(0.0, 0.0, 0.0),
         };
         all.push(b);
     }
-    */
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
